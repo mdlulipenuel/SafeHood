@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeHood - Neighborhood Safety App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🏘️ SafeHood</h1>
+            <p class="tagline">Stay informed about safety in your neighborhood</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="report-section">
+            <h2>Report an Incident</h2>
+            <form id="incidentForm">
+                <div class="form-group">
+                    <label for="incidentType">Incident Type:</label>
+                    <select id="incidentType" required>
+                        <option value="">Select type...</option>
+                        <option value="theft">Theft</option>
+                        <option value="vandalism">Vandalism</option>
+                        <option value="suspicious">Suspicious Activity</option>
+                        <option value="lighting">Poor Lighting</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Location:</label>
+                    <input type="text" id="location" placeholder="Street address or area" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea id="description" rows="4" placeholder="Describe what happened..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="severity">Severity:</label>
+                    <select id="severity" required>
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Report</button>
+            </form>
+        </section>
+
+        <section class="incidents-section">
+            <h2>Recent Incidents</h2>
+            <div class="filter-bar">
+                <label for="filterType">Filter by type:</label>
+                <select id="filterType">
+                    <option value="all">All</option>
+                    <option value="theft">Theft</option>
+                    <option value="vandalism">Vandalism</option>
+                    <option value="suspicious">Suspicious Activity</option>
+                    <option value="lighting">Poor Lighting</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div id="incidentsList" class="incidents-list">
+                <!-- Incidents will be displayed here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SafeHood. Keeping neighborhoods safe together.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
