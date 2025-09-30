@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, MapIcon, BarChart3, Bell, User, Plus, Filter, Settings, LogOut } from 'lucide-react';
+import { Shield, MapIcon, BarChart3, Bell, User, Plus, Filter, Settings } from 'lucide-react';
 import AdvancedSafetyMap from './components/AdvancedSafetyMap';
 import MobileReportForm from './components/MobileReportForm';
-import AuthModal from './components/AuthModal';
+import ProfileManager from './components/ProfileManager';
 import MonitoringZones from './components/MonitoringZones';
 import { DataManager } from './utils/dataManager';
 import { authService } from './utils/authService';
@@ -26,7 +26,6 @@ const SafeHoodApp: React.FC = () => {
     loading: true, 
     error: null 
   });
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
 
   // Load neighborhood stats
@@ -70,10 +69,6 @@ const SafeHoodApp: React.FC = () => {
   }, [authState.isAuthenticated]);
 
   // Handle authentication
-  const handleLogin = () => {
-    setShowAuthModal(true);
-  };
-
   const handleLogout = async () => {
     await authService.logout();
     setAuthState(authService.getAuthState());
@@ -82,7 +77,6 @@ const SafeHoodApp: React.FC = () => {
   const handleAuthSuccess = async () => {
     const currentState = authService.getAuthState();
     setAuthState(currentState);
-    setShowAuthModal(false);
   };
 
   // Handle incident click from map
@@ -242,11 +236,10 @@ const SafeHoodApp: React.FC = () => {
       case 'profile':
         return (
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Profile</h2>
-            <UserProfile 
+            <ProfileManager 
               authState={authState}
-              onLogin={handleLogin}
               onLogout={handleLogout}
+              onAuthSuccess={handleAuthSuccess}
             />
           </div>
         );
@@ -294,8 +287,8 @@ const SafeHoodApp: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto">
-        <div className="h-[calc(100vh-8rem)] md:h-[calc(100vh-4rem)]">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="h-[calc(100vh-8rem)] md:h-[calc(100vh-8rem)]">
           {renderView()}
         </div>
       </main>
@@ -329,14 +322,6 @@ const SafeHoodApp: React.FC = () => {
         />
       )}
 
-      {/* Authentication Modal */}
-      {showAuthModal && (
-        <AuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          onAuthSuccess={handleAuthSuccess}
-        />
-      )}
     </div>
   );
 };
@@ -424,91 +409,6 @@ const AnalyticsDashboard: React.FC<{ stats: any }> = ({ stats }) => {
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-// User Profile Component
-const UserProfile: React.FC<{ 
-  authState: AuthState, 
-  onLogin: () => void, 
-  onLogout: () => void 
-}> = ({ authState, onLogin, onLogout }) => {
-  if (!authState.isAuthenticated || !authState.user) {
-    return (
-      <div className="text-center py-12">
-        <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Not Logged In</h3>
-        <p className="text-gray-600 mb-4">Sign in to access your profile and premium features</p>
-        <button
-          onClick={onLogin}
-          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Sign In
-        </button>
-      </div>
-    );
-  }
-
-  const user = authState.user;
-
-  return (
-    <div className="max-w-2xl space-y-6">
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center space-x-4 mb-6">
-          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-            <User className="w-8 h-8 text-white" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-900">{user.name}</h3>
-            <p className="text-gray-600">{user.email}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{user.reportsSubmitted}</div>
-            <div className="text-sm text-gray-600">Reports Submitted</div>
-          </div>
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">{user.communityScore}</div>
-            <div className="text-sm text-gray-600">Community Score</div>
-          </div>
-        </div>
-
-        <div className="mt-6 pt-6 border-t">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-gray-700">Account Type</span>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-              user.isProfessional 
-                ? 'bg-purple-100 text-purple-800' 
-                : user.isPremium 
-                ? 'bg-yellow-100 text-yellow-800' 
-                : 'bg-gray-100 text-gray-800'
-            }`}>
-              {user.isProfessional ? 'Professional' : user.isPremium ? 'Premium' : 'Basic'}
-            </span>
-          </div>
-          
-          <button
-            onClick={onLogout}
-            className="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors flex items-center justify-center space-x-2"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Sign Out</span>
-          </button>
-        </div>
-      </div>
-
-      {!user.isPremium && (
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow p-6 text-white">
-          <h3 className="text-lg font-bold mb-2">Upgrade to Premium</h3>
-          <p className="text-blue-100 mb-4">Get advanced analytics, priority alerts, and exclusive insights</p>
-          <button className="bg-white text-blue-600 px-6 py-2 rounded-md font-medium hover:bg-gray-100 transition-colors">
-            Upgrade Now - $9.99/month
-          </button>
-        </div>
-      )}
     </div>
   );
 };
